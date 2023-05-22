@@ -1,26 +1,33 @@
 import "./App.css";
-import Axios from "axios";
-import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { Contact } from "./pages/Contact";
+import { Navbar } from "./Navbar";
+import { Profile } from "./pages/Profile";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
-  const [generatedExcuse, setGeneratedExcuse] = useState("");
-
-  const fetchExcuse = (excuse) => {
-    Axios.get(`https://excuser-three.vercel.app/v1/excuse/${excuse}/`).then(
-      (res) => {
-        setGeneratedExcuse(res.data[0].excuse);
-      }
-    );
-  };
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
 
   return (
     <div className="App">
-      <h1> Generate An Excuse </h1>
-      <button onClick={() => fetchExcuse("party")}> Party</button>
-      <button onClick={() => fetchExcuse("family")}> Family</button>
-      <button onClick={() => fetchExcuse("office")}> Office </button>
-
-      <p> {generatedExcuse} </p>
+      <QueryClientProvider client={client}>
+        <Router>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<h1> PAGE NOT FOUND ): </h1>} />
+          </Routes>
+        </Router>
+      </QueryClientProvider>
     </div>
   );
 }
